@@ -1,17 +1,17 @@
-R2DTo
-=====
+Lazy serializer
+================
 
 ![Build Status](https://travis-ci.org/nickswebsite/r2dto.svg?branch=master)
 
-Pronounced R-2-D-2.
+A fork of awesome [R2DTO](https://github.com/nickswebsite/r2dto) by @nickswebsite.
 
-Provides django like interface for transformation and validation of arbitrary
+Provides easy interface for transformation and validation of arbitrary
 python objects into DTOs suitable for receiving from and delivering to other services.
 
 (Note that installation requires setuptools.)
 
 Quick Start
------------
+------------
 
 Create your 'model' class
 
@@ -32,31 +32,50 @@ Create your 'serializer' class:
     ...     class Meta:
     ...         model = Simpson
 
-When you get a payload that requires one of these serializers, instantiate a serializer using the `data` keyword
-argument and pass in the data dictionary.
+When you get a payload that requires one of these serializers, call `Serializer.load(data)`.
 
     >>> data = {
     ...     "firstName": "Homer",
     ...     "lastName": "Simpson",
     ... }
-    >>> s = SimpsonSerializer(data=data)
-    >>> s.validate()
-    >>> str(s.object)
-    'Homer Simpson'
-    >>> type(s.object)
+    >>> s = SimpsonSerializer.load(data)
+    >>> s
     <class '__main__.Simpson'>
+    >>> str(s)
+    'Homer Simpson'
 
-To go the other way.  Pass the object you want to transfer into the constructor using the `object` keyword argument:
+To go the other way. Pass the object you want to transfer into the `dump` method:
 
     >>> homer = Simpson()
     >>> homer.first_name = "Homer"
     >>> homer.last_name = "Simpson"
-    >>> s = SimpsonSerializer(object=homer)
-    >>> s.validate()
-    >>> s.data["firstName"]
-    'Homer'
-    >>> s.data["lastName"]
-    'Simpson'
+    >>> s = SimpsonSerializer.dump(homer)
+    >>> s
+    {'firstName': 'Homer', 'lastName': 'Simpson'}
+
+Readonly and hidden fields
+---------------------------
+
+To hide a field from output, use keyword `hidden`:
+
+    >>> class BartSerializer(Serializer):
+    ...     grade = fields.StringField(hidden=True)
+    ...
+    >>> o = BartSerializer.load({"grade": "C"})
+    >>> o
+    <lazy_serializer.base.DefaultModel object at 0x7f50d8d69eb8>
+    >>> BartSerializer.dump(o)
+    {}
+
+To make a field readonly, use... well, you guessed it:
+
+    >>> class NewBartSerializer(Serializer):
+    ...     grade = fields.StringField(readonly=True)
+    ...
+    >>> NewBartSerializer.load({"grade": "C"})
+    Traceback (most recent call last):
+      [...]
+    lazy_serializer.base.ValidationError: ['Field grade is read only.']
 
 Fields
 ------

@@ -37,10 +37,10 @@ class DocsCommand(Command):
 
 
 setup(
-    name="r2dto",
-    author="The Magnificant Nick",
-    author_email="send_me_spam@yahoo.com",
-    url="https://github.com/nickswebsite/r2dto",
+    name="lazy-serializer",
+    author="Ale",
+    author_email="ale@songbee.net",
+    url="https://github.com/G-M-D/lazy-serializer",
     version=__version__,
     description=__doc__,
     keywords="dto serializer serialize REST marshal JSON",

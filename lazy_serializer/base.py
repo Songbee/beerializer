@@ -27,13 +27,15 @@ class InvalidTypeValidationError(ValidationError):
 
 
 class BaseField(object):
-    def __init__(self, name=None, required=False, allow_null=True, validators=None):
+    def __init__(self, name=None, required=False, allow_null=True, validators=None, hidden=False, readonly=False):
         self.name = name
         self.object_field_name = name
         self.required = required
         self.allow_null = allow_null
         self.parent = None
         self.validators = validators or []
+        self.hidden = hidden
+        self.readonly = readonly
 
     def clean(self, data):
         return data
@@ -95,38 +97,35 @@ class BaseSerializer(object):
     fields = []
     options = None
 
-    def __init__(self, data=None, object=None):
-        if data is None and object is None or data is not None and object is not None:
-            raise ValueError("Either 'object' or 'data' must be supplied as arguments, but not both.")
-        self.data = data
-        self.object = object
+    def __init__(self):
+        pass
 
-    def validate(self):
-        self.base_validate()
-
-    def base_validate(self):
-        if self.object is None and self.data is not None:
-            self.data_to_object()
-        else:
-            self.object_to_data()
-
-    def data_to_object(self):
+    @classmethod
+    def load(self, data):
         model_class = getattr(self.options, "model", DefaultModel)
         model_class_args = getattr(self.options, "model_init_args", ())
         model_class_kwargs = getattr(self.options, "model_init_kwargs", {})
 
+        obj = model_class(*model_class_args, **model_class_kwargs)
+        self.update(data, obj)
+        return obj
+
+    @classmethod
+    def update(self, data, obj):
         errors = []
         for field in self.fields:
-            if field.required and field.name not in self.data:
+            if field.required and field.name not in data:
                 errors.append("Field {} is missing.".format(field.name))
+
+            if field.readonly and field.name in data:
+                errors.append("Field {} is read only.".format(field.name))
 
         if errors:
             raise ValidationError(errors)
 
-        obj = model_class(*model_class_args, **model_class_kwargs)
         for field in self.fields:
             try:
-                field_obj = field.base_clean(self.data[field.name])
+                field_obj = field.base_clean(data[field.name])
             except ValidationError as ex:
                 errors.extend(ex.errors)
             except KeyError:
@@ -137,9 +136,8 @@ class BaseSerializer(object):
         if errors:
             raise ValidationError(errors)
 
-        self.object = obj
-
-    def object_to_data(self):
+    @classmethod
+    def dump(self, obj):
         errors = []
         for field in self.fields:
             if field.required and not hasattr(self.object, field.object_field_name):
@@ -150,17 +148,18 @@ class BaseSerializer(object):
 
         data = {}
         for field in self.fields:
-            try:
-                field_data = field.base_object_to_data(getattr(self.object, field.object_field_name))
-            except ValidationError as ex:
-                errors.extend(ex.errors)
-            else:
-                data[field.name] = field_data
+            if not field.hidden:
+                try:
+                    field_data = field.base_object_to_data(getattr(obj, field.object_field_name))
+                except ValidationError as ex:
+                    errors.extend(ex.errors)
+                else:
+                    data[field.name] = field_data
 
         if errors:
             raise ValidationError(errors)
 
-        self.data = data
+        return data
 
 
 class Serializer(with_metaclass(SerializerMetaclass, BaseSerializer)):
