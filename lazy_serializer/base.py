@@ -27,7 +27,9 @@ class InvalidTypeValidationError(ValidationError):
 
 
 class BaseField(object):
-    def __init__(self, name=None, required=False, allow_null=True, validators=None, hidden=False, readonly=False):
+    def __init__(self, name=None, required=False, allow_null=True,
+                       validators=None, hidden=False, readonly=False,
+                       setter_method=None):
         self.name = name
         self.object_field_name = name
         self.required = required
@@ -36,6 +38,7 @@ class BaseField(object):
         self.validators = validators or []
         self.hidden = hidden
         self.readonly = readonly
+        self.setter_method = setter_method
 
     def clean(self, data):
         return data
@@ -125,7 +128,11 @@ class BaseSerializer(object):
 
         for field in self.fields:
             try:
-                field_obj = field.base_clean(data[field.name])
+                if type(field.setter_method) is str:
+                    field_data = getattr(self, field.setter_method)(data)
+                else:
+                    field_data = data[field.name]
+                field_obj = field.base_clean(field_data)
             except ValidationError as ex:
                 errors.extend(ex.errors)
             except KeyError:
