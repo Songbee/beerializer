@@ -110,11 +110,11 @@ class BaseSerializer(object):
         model_class_kwargs = getattr(self.options, "model_init_kwargs", {})
 
         obj = model_class(*model_class_args, **model_class_kwargs)
-        self.update(data, obj)
+        self.update(data, obj, _is_update=False)
         return obj
 
     @classmethod
-    def update(self, data, obj):
+    def update(self, data, obj, _is_update=True):
         errors = []
         for field in self.fields:
             if field.required and field.name not in data:
@@ -129,7 +129,7 @@ class BaseSerializer(object):
         for field in self.fields:
             try:
                 if type(field.setter_method) is str:
-                    field_data = getattr(self, field.setter_method)(data)
+                    field_data = getattr(self, field.setter_method)(data, is_update=_is_update)
                 else:
                     field_data = data[field.name]
                 field_obj = field.base_clean(field_data)
