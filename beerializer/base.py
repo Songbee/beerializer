@@ -1,3 +1,6 @@
+import warnings
+
+
 # Copied from the 'six' module.
 def with_metaclass(meta, *bases):
     """Create a base class with a metaclass."""
@@ -117,11 +120,15 @@ class BaseSerializer(object):
         model_class_kwargs = getattr(self.options, "model_init_kwargs", {})
 
         obj = model_class(*model_class_args, **model_class_kwargs)
-        self.update(data, obj)
+        self.update(obj, data)
         return obj
 
     @classmethod
-    def update(self, data, obj):
+    def update(self, obj, data):
+        if not isinstance(data, dict):
+            warnings.warn("Use update(obj, data) insead of (data, obj)",
+                DeprecationWarning)
+            obj, data = data, obj
         errors = []
         for field in self.fields:
             if field.required and field.name not in data:
