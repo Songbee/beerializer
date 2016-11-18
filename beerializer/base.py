@@ -2,6 +2,7 @@
 def with_metaclass(meta, *bases):
     """Create a base class with a metaclass."""
     class metaclass(meta):
+
         def __new__(cls, name, this_bases, d):
             return meta(name, bases, d)
     return type.__new__(metaclass, 'temporary_class', (), {})
@@ -14,6 +15,7 @@ except NameError:
 
 
 class ValidationError(Exception):
+
     def __init__(self, errors):
         if isinstance(errors, basestring):
             errors = [errors]
@@ -22,11 +24,14 @@ class ValidationError(Exception):
 
 
 class InvalidTypeValidationError(ValidationError):
+
     def __init__(self, field_name, expected, got):
-        super(InvalidTypeValidationError, self).__init__("{} must be a {}.  Got {}.".format(field_name, expected, got))
+        super(InvalidTypeValidationError, self).__init__(
+            "{} must be a {}.  Got {}.".format(field_name, expected, got))
 
 
 class BaseField(object):
+
     def __init__(self, name=None, required=False, allow_null=True, validators=None, hidden=False, readonly=False):
         self.name = name
         self.object_field_name = name
@@ -43,7 +48,8 @@ class BaseField(object):
     def base_clean(self, data):
         if data is None:
             if not self.allow_null:
-                raise ValidationError("{}/{} cannot be null/None".format(self.name, self.object_field_name))
+                raise ValidationError(
+                    "{}/{} cannot be null/None".format(self.name, self.object_field_name))
             return None
         data = self.clean(data)
         for validator in self.validators:
@@ -56,7 +62,8 @@ class BaseField(object):
     def base_object_to_data(self, obj):
         if obj is None:
             if not self.allow_null:
-                raise ValidationError("{}/{} cannot be null/None".format(self.name, self.object_field_name))
+                raise ValidationError(
+                    "{}/{} cannot be null/None".format(self.name, self.object_field_name))
             return None
         return self.object_to_data(obj)
 
@@ -70,6 +77,7 @@ class DefaultModel(object):
 
 
 class SerializerMetaclass(type):
+
     def __new__(cls, name, bases, attrs):
         options = DefaultMeta
 
@@ -84,10 +92,12 @@ class SerializerMetaclass(type):
                 v.object_field_name = k
                 fields.append(v)
 
-        new_class_attrs = {k: v for k, v in attrs.items() if not isinstance(v, BaseField)}
+        new_class_attrs = {k: v for k,
+                           v in attrs.items() if not isinstance(v, BaseField)}
         new_class_attrs["fields"] = fields
         new_class_attrs["options"] = options
-        ret = super(SerializerMetaclass, cls).__new__(cls, name, bases, new_class_attrs)
+        ret = super(SerializerMetaclass, cls).__new__(
+            cls, name, bases, new_class_attrs)
         for field in fields:
             field.parent = ret
         return ret
@@ -141,7 +151,8 @@ class BaseSerializer(object):
         errors = []
         for field in self.fields:
             if field.required and not hasattr(self.object, field.object_field_name):
-                errors.append("Field {} is missing from object.".format(field.object_field_name))
+                errors.append("Field {} is missing from object.".format(
+                    field.object_field_name))
 
         if errors:
             raise ValidationError(errors)
@@ -150,7 +161,8 @@ class BaseSerializer(object):
         for field in self.fields:
             if not field.hidden:
                 try:
-                    field_data = field.base_object_to_data(getattr(obj, field.object_field_name))
+                    field_data = field.base_object_to_data(
+                        getattr(obj, field.object_field_name))
                 except ValidationError as ex:
                     errors.extend(ex.errors)
                 else:
