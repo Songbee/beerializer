@@ -3,7 +3,7 @@ Package to convert arbitrary python objects into DTOs ready
 for serialization and validation.
 """
 
-__version__ = "0.1.0"
+__version__ = "0.1.3"
 
 from setuptools import setup
 
@@ -14,9 +14,8 @@ setup(
     author_email="hi@songbee.net",
     url="https://github.com/Songbee/beerializer",
     version=__version__,
-    description=__doc__,
-    setup_requires=["setuptools-markdown"],
-    long_description_markdown_filename="README.md",
+    description=__doc__.replace("\n", " "),
+    long_description=open("README.rst").read(),
     keywords="dto serializer serialize REST marshal JSON",
     packages=["beerializer"],
     classifiers=[
