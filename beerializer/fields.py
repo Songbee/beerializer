@@ -216,3 +216,10 @@ class UuidField(StringField):
         if not isinstance(obj, uuid.UUID):
             raise InvalidTypeValidationError(self.name, "uuid", type(obj))
         return str(obj)
+
+
+class DictField(BaseTypeValidatorField, BaseField):
+    """
+    Represents an arbitrary dict.
+    """
+    basetypes = (dict,)

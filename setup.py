@@ -3,7 +3,7 @@ Package to convert arbitrary python objects into DTOs ready
 for serialization and validation.
 """
 
-__version__ = "0.1.3"
+__version__ = "0.1.4"
 
 from setuptools import setup
 
