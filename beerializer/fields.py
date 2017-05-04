@@ -75,14 +75,10 @@ class ObjectField(BaseField):
         self.serializer_class = serializer_class
 
     def clean(self, data):
-        s = self.serializer_class(data=data)
-        s.validate()
-        return s.object
+        return self.serializer_class.load(data)
 
     def object_to_data(self, obj):
-        s = self.serializer_class(object=obj)
-        s.validate()
-        return s.data
+        return self.serializer_class.dump(obj)
 
 
 class ListField(BaseField):
