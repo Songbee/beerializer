@@ -125,10 +125,6 @@ class BaseSerializer(object):
 
     @classmethod
     def update(self, obj, data):
-        if not isinstance(data, dict):
-            warnings.warn("Use update(obj, data) insead of (data, obj)",
-                DeprecationWarning)
-            obj, data = data, obj
         errors = []
         for field in self.fields:
             if field.required and field.name not in data:
