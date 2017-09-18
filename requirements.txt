@@ -1,0 +1,3 @@
+# for building docs
+-e .
+Sphinx
