@@ -1,14 +1,19 @@
 Beerializer
 ===========
 
-|Documentation Status|
+.. image:: https://img.shields.io/badge/docs-latest-green.svg
+           :target: https://beerializer.songbee.net/
+           :alt: Documentation
+.. image:: https://img.shields.io/pypi/v/beerializer.svg
+           :target: https://pypi.org/project/beerializer/
+           :alt: PyPI
 
 A fork of awesome `R2DTO <https://github.com/nickswebsite/r2dto>`__ by
-@nickswebsite.
+`nickswebsite <https://github.com/nickswebsite>`__.
 
-Provides easy interface for transformation and validation of arbitrary
-python objects into DTOs suitable for receiving from and delivering to
-other services.
+Beerializer provides easy interface for transformation and validation of
+arbitrary python objects into DTOs suitable for receiving from and delivering
+to other services.
 
 Quick Start
 -----------
@@ -63,5 +68,8 @@ To go the other way. Pass the object you want to transfer into the
     >>> s
     {'firstName': 'Homer', 'lastName': 'Simpson'}
 
-.. |Documentation Status| image:: https://readthedocs.org/projects/beerializer/badge/?version=latest
-   :target: http://beerializer.readthedocs.io/en/latest/?badge=latest
+Ready for the journey? Install it, then check out `the docs`_::
+
+    $ pip install -U beerializer
+
+.. _the docs: https://beerializer.songbee.net/

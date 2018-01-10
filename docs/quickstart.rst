@@ -14,8 +14,8 @@ Let's start by creating a simple model class::
         def __str__(self):
             return self.first_name + " " + self.last_name
 
-To create a serializer, we need to map model attributes to fields of
-the resulting DTO::
+To create a serializer, we need to map model attributes to fields of the
+resulting object::
 
     from beerializer import Serializer, fields
 
@@ -39,8 +39,8 @@ When you get a payload that requires one of these serializers, call
     >>> str(s)
     'Homer Simpson'
 
-To go the other way. Pass the object you want to transfer into the
-``dump`` method::
+To go the other way. Pass the object you want to transfer into the ``dump``
+method::
 
     >>> homer = Simpson()
     >>> homer.first_name = "Homer"
@@ -95,18 +95,18 @@ Now you only need to specify model on a serializer::
 
 You can specify which fields to dump by specifying ``Meta.fields``::
 
-    >>> class MiniUserSerializer(ModelSerializer):
+    >>> class TinyUserSerializer(ModelSerializer):
     ...     class Meta:
     ...         model = User
     ...         fields = ["last_name"]
     ...
-    >>> MiniUserSerializer.dump(homer)
+    >>> TinyUserSerializer.dump(homer)
     {'last_name': 'Simpson'}
 
-To override any options for a field or if its type can't be guessed,
-just add it as you would usually do::
+To override any options for a field or if its type can't be guessed, just add it
+as you would usually do::
 
-    >>> from lazy_serializer.contrib.sqlalchemy import ModelSerializer
+    >>> from beerializer_sqlalchemy import ModelSerializer
     >>> class StrangeUserSerializer(ModelSerializer):
     ...     first_name = fields.StringField(name="firstName")
     ...     class Meta:
@@ -118,9 +118,8 @@ just add it as you would usually do::
 Fields
 ------
 
-To implement your own fields, derive from ``Field`` and implement
-``clean`` and ``object_to_data``. ``ValidationError`` should be thrown
-if the data is bad.
+To implement your own fields, derive from ``Field`` and implement ``clean`` and
+``object_to_data``. ``ValidationError`` should be thrown if the data is bad.
 
 ::
 
@@ -135,8 +134,8 @@ if the data is bad.
         def object_to_data(self, obj):
             return str(obj)
 
-When you go to create your serializer, just use the field as you would
-any other field.
+When you go to create your serializer, just use the field as you would any other
+field.
 
 ::
 
@@ -152,10 +151,9 @@ any other field.
 Validators
 ----------
 
-You can specify custom validators for individual fields. These are just
-objects with a 'validate' method that accepts the field and the data as
-parameters. ValidationError should be raised if there is a problem with
-validation.
+You can specify custom validators for individual fields. These are just objects
+with a 'validate' method that accepts the field and the data as parameters.
+ValidationError should be raised if there is a problem with validation.
 
 ::
 
@@ -169,8 +167,8 @@ validation.
                     "{} must be one of {}. Got {}."
                         .format(field.name, self.choices, data))
 
-Use the 'validators' key word argument to use the validator with a
-particular field.
+Use the 'validators' key word argument to use the validator with a particular
+field.
 
 ::
 
