@@ -1,6 +1,11 @@
 Beerializer
 ===========
 
+**Deprecated:** this project haven't received the love it needs for a few
+years now. I kindly suggest using `Pydantic <https://pydantic-docs.helpmanual.io/>`__
+for new projects (and for backend development, check out the awesome
+`FastAPI <https://fastapi.tiangolo.com/>`__ framework!).
+
 .. image:: https://img.shields.io/badge/docs-latest-green.svg
            :target: https://beerializer.songbee.net/
            :alt: Documentation
